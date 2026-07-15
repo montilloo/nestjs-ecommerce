@@ -96,3 +96,38 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+AppModule
+│
+▼
+imports
+│
+▼
+ConfigModule.forRoot(...)
+│
+▼
+读取 .env
+│
+▼
+创建 ConfigService
+│
+▼
+注册到 IOC 容器
+│
+▼
+TypeOrmModule.forRootAsync(...)
+│
+▼
+inject: [ConfigService]
+│
+▼
+useFactory(configService)
+│
+▼
+创建 DataSource
+│
+▼
+连接 MySQL
+│
+▼
+注册 Repository Provider
