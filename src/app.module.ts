@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
+import { ProductModule } from './modules/product/product.module';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import { AppController } from './app.controller';
@@ -19,6 +20,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
         dbConfig: ConfigType<typeof databaseConfig>,
       ): TypeOrmModuleOptions => dbConfig,
     }),
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],
