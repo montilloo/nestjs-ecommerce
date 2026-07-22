@@ -7,10 +7,16 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  constructor(private readonly configService: ConfigService) {}
   private readonly logger = new Logger(HttpExceptionFilter.name);
+
+  private isProduction(): boolean {
+    return this.configService.get<string>('app.nodeEnv') === 'production';
+  }
 
   private getStatus(exception: unknown): number {
     if (exception instanceof HttpException) {
@@ -20,6 +26,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
   }
 
   private getMessage(exception: unknown): string {
+    // 生产环境隐藏内部错误
+    if (this.isProduction()) {
+      return 'Internal server error';
+    }
+
     if (exception instanceof HttpException) {
       const response = exception.getResponse();
       if (typeof response === 'string') {
@@ -34,6 +45,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
         }
         return error.message ?? 'Internal server error';
       }
+    }
+    if (exception instanceof Error) {
+      return exception.message;
     }
     return 'Internal server error';
   }
@@ -73,6 +87,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
     };
   }
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<Request>();

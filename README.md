@@ -131,3 +131,13 @@ useFactory(configService)
 │
 ▼
 注册 Repository Provider
+
+## Entity 描述数据库中的数据结构，DTO 描述应用之间传输的数据结构。
+
+Entity
+↓
+数据库持久化
+
+DTO
+↓
+数据传输

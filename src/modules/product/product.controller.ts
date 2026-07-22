@@ -22,4 +22,11 @@ export class ProductController {
   findAll(@Query() query: QueryProductDto): Promise<Product[]> {
     return this.productService.findAll(query);
   }
+
+  @Get('test-error')
+  testError() {
+    // throw new NotFoundException('商品不存在');
+    // throw new BadRequestException('参数错误');
+    throw new Error('数据库连接失败');
+  }
 }
