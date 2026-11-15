@@ -4,8 +4,8 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { QueryProductDto } from './dto/query-product.dto';
 import { Product } from './entities/product.entity';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 
 @Controller('products')
 @UseGuards(RolesGuard)
@@ -21,6 +21,12 @@ export class ProductController {
   @Get()
   findAll(@Query() query: QueryProductDto): Promise<Product[]> {
     return this.productService.findAll(query);
+  }
+
+  @Get('available')
+  findAvailableProducts(@Query() query: QueryProductDto): Promise<Product[]> {
+    const { page = 1, limit = 10 } = query;
+    return this.productService.findAvailableProducts(page, limit);
   }
 
   @Get('test-error')

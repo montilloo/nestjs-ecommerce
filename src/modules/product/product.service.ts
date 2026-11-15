@@ -29,4 +29,15 @@ export class ProductService {
       take: limit,
     });
   }
+
+  async findAvailableProducts(page = 1, limit = 10): Promise<Product[]> {
+    return this.productRepository
+      .createQueryBuilder('product')
+      .where('product.status = :status', { status: 1 })
+      .andWhere('product.stock > :stock', { stock: 0 })
+      .orderBy('product.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getMany();
+  }
 }
