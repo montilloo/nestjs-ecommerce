@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 
+@Injectable()
 export class PasswordService {
   private derive(password: string, salt: Buffer): Promise<Buffer> {
     return new Promise((resolve, reject) => {
@@ -17,6 +18,7 @@ export class PasswordService {
         (err, derivedKey) => {
           if (err) {
             reject(err);
+            return;
           }
           resolve(derivedKey);
         },
