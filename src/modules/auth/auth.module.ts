@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
+import { UserModule } from '../user/user.module';
+
 @Module({
   imports: [
     JwtModule.registerAsync({
@@ -28,6 +30,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
         };
       },
     }),
+    UserModule,
   ],
   providers: [JwtAuthGuard],
   exports: [JwtModule, JwtAuthGuard], // exports: [JwtModule]：后续导入 AuthModule 的模块可以注入 JwtService。
