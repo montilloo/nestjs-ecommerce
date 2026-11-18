@@ -17,13 +17,14 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('products')
-@UseGuards(RolesGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   create(@Body() dto: CreateProductDto): Promise<Product> {
     return this.productService.create(dto);
@@ -52,6 +53,7 @@ export class ProductController {
    * `UpdateProductDto` 配合已有全局校验检查请求体。
    */
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   update(
     @Param('id', ParseIntPipe) id: number,
