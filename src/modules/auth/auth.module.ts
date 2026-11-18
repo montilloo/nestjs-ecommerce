@@ -5,6 +5,8 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 
 import { UserModule } from '../user/user.module';
 
+import { PasswordService } from './password.service';
+
 @Module({
   imports: [
     JwtModule.registerAsync({
@@ -32,7 +34,7 @@ import { UserModule } from '../user/user.module';
     }),
     UserModule,
   ],
-  providers: [JwtAuthGuard],
+  providers: [JwtAuthGuard, PasswordService],
   exports: [JwtModule, JwtAuthGuard], // exports: [JwtModule]：后续导入 AuthModule 的模块可以注入 JwtService。
 })
 export class AuthModule {}
