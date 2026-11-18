@@ -1,8 +1,19 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { QueryProductDto } from './dto/query-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -34,5 +45,18 @@ export class ProductController {
     // throw new NotFoundException('商品不存在');
     // throw new BadRequestException('参数错误');
     throw new Error('数据库连接失败');
+  }
+
+  /**
+   * ParseIntPipe 将路径参数转换成整数，无法转换时返回 400
+   * `UpdateProductDto` 配合已有全局校验检查请求体。
+   */
+  @Patch(':id')
+  @Roles('admin')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateProductDto,
+  ): Promise<Product> {
+    return this.productService.update(id, dto);
   }
 }
