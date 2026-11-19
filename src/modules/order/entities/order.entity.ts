@@ -41,7 +41,7 @@ export class Order {
   unitPrice!: string;
 
   // 金额用字符串接收：保留 MySQL decimal 的精确十进制表示。下一步计算总金额时会专门处理，不能直接将字符串相乘。
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 12, scale: 2 })
   totalAmount!: string;
 
   @Column({
