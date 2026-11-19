@@ -9,6 +9,8 @@ import { AppService } from './app.service';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
+import { OrderModule } from './modules/order/order.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -27,6 +29,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
       ): TypeOrmModuleOptions => dbConfig,
     }),
     ProductModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [
