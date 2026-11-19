@@ -5,11 +5,15 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Index,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Product } from '../../product/entities/product.entity';
 
 @Entity('orders')
+@Index('UQ_orders_user_request', ['userId', 'requestId'], {
+  unique: true,
+}) //创建数据库索引。可用于实体属性或实体。在实体上使用时，可以使用复合列创建索引。
 export class Order {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -53,4 +57,11 @@ export class Order {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @Column({
+    type: 'varchar',
+    length: 36,
+    nullable: true,
+  })
+  requestId!: string | null;
 }
