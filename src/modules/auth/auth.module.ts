@@ -6,6 +6,8 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { UserModule } from '../user/user.module';
 
 import { PasswordService } from './password.service';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 
 @Module({
   imports: [
@@ -34,7 +36,8 @@ import { PasswordService } from './password.service';
     }),
     UserModule,
   ],
-  providers: [JwtAuthGuard, PasswordService],
+  controllers: [AuthController],
+  providers: [JwtAuthGuard, PasswordService, AuthService],
   exports: [JwtModule, JwtAuthGuard], // exports: [JwtModule]：后续导入 AuthModule 的模块可以注入 JwtService。
 })
 export class AuthModule {}
