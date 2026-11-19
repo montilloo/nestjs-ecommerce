@@ -1,4 +1,4 @@
-import { IsInt, Max, Min } from 'class-validator';
+import { IsInt, Max, Min, IsUUID } from 'class-validator';
 
 export class CreateOrderDto {
   @IsInt({ message: '商品 ID 必须是整数' })
@@ -11,4 +11,7 @@ export class CreateOrderDto {
   @Min(1, { message: '数量不能小于 1' })
   @Max(100, { message: '数量不能大于 100' })
   quantity!: number;
+
+  @IsUUID('4', { message: 'requestId 必须是有效的 UUID v4' })
+  requestId!: string;
 }
