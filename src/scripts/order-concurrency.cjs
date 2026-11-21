@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const { randomUUID } = require('node:crypto');
 
 const baseUrl = 'http://localhost:3000';
 
@@ -54,6 +55,7 @@ async function main() {
 
   assert.equal(reset.status, 200, '测试商品初始化失败');
 
+  const requestId = randomUUID();
   // 先发出所有请求，再等待结果；没有逐条 await
   // 这里用 Promise.allSettled() 等待所有请求结束，避免某个请求发生网络错误后，其他请求尚未完成就提前得出结论。
   const results = await Promise.allSettled(
@@ -64,6 +66,7 @@ async function main() {
         {
           productId,
           quantity: 1,
+          requestId,
         },
         token,
       ),
