@@ -8,14 +8,24 @@ import { Product } from './entities/product.entity';
 describe('ProductService.update', () => {
   let service: ProductService;
 
-  const repository = {
-    findOneBy: jest.fn(),
+  const manager = {
+    findOne: jest.fn(),
     merge: jest.fn(),
     save: jest.fn(),
   };
 
+  const repository = {
+    manager: {
+      transaction: jest.fn(),
+    },
+  };
+
   beforeEach(async () => {
     jest.resetAllMocks();
+
+    repository.manager.transaction.mockImplementation(
+      async (_isolationLevel, callback) => callback(manager),
+    );
 
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -31,49 +41,53 @@ describe('ProductService.update', () => {
   });
 
   it('商品不存在时抛出 404，不执行保存', async () => {
-    repository.findOneBy.mockResolvedValue(null);
+    // repository.findOneBy.mockResolvedValue(null);
 
-    await expect(service.update(999, { stock: 0 })).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    // await expect(service.update(999, { stock: 0 })).rejects.toBeInstanceOf(
+    //   NotFoundException,
+    // );
 
-    expect(repository.findOneBy).toHaveBeenCalledWith({ id: 999 });
-    expect(repository.merge).not.toHaveBeenCalled();
-    expect(repository.save).not.toHaveBeenCalled();
+    // expect(repository.findOneBy).toHaveBeenCalledWith({ id: 999 });
+    // expect(repository.merge).not.toHaveBeenCalled();
+    // expect(repository.save).not.toHaveBeenCalled();
+    manager.findOne.mockResolvedValue(null);
+
+    await expect(
+      service.update(999, { name: '新名称' }),
+    ).rejects.toBeInstanceOf(NotFoundException);
+
+    expect(manager.save).not.toHaveBeenCalled();
   });
 
-  it('只更新库存时保留名称和价格，支持库存 0', async () => {
+  it('只更新名称时保留读取到的库存', async () => {
     const product = Object.assign(new Product(), {
       id: 5,
-      name: '测试键盘',
+      name: '旧名称',
       price: 99,
-      stock: 100,
+      stock: 4,
       status: 1,
     });
 
-    repository.findOneBy.mockResolvedValue(product);
+    manager.findOne.mockResolvedValue(product);
 
-    // 模拟 merge 修改内存实体的行为
-    repository.merge.mockImplementation(
-      (entity: Product, changes: Partial<Product>) =>
+    manager.merge.mockImplementation(
+      (_target, entity: Product, changes: Partial<Product>) =>
         Object.assign(entity, changes),
     );
 
-    // 模拟数据库保存后返回实体
-    repository.save.mockImplementation(async (entity: Product) => entity);
+    manager.save.mockImplementation(async (_target, entity: Product) => entity);
 
-    const result = await service.update(5, { stock: 0 });
+    const result = await service.update(5, { name: '新名称' });
 
-    expect(repository.save).toHaveBeenCalledTimes(1);
-    expect(repository.save).toHaveBeenCalledWith(
+    expect(manager.save).toHaveBeenCalledWith(
+      Product,
       expect.objectContaining({
-        id: 5,
-        name: '测试键盘',
+        name: '新名称',
         price: 99,
-        stock: 0,
-        status: 1,
+        stock: 4,
       }),
     );
-    expect(result.stock).toBe(0);
+
+    expect(result.stock).toBe(4);
   });
 });

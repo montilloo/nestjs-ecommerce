@@ -60,14 +60,22 @@ export class ProductService {
   }
 
   async update(id: number, dto: UpdateProductDto): Promise<Product> {
-    // step1: 查找商品：`findOneBy({ id })` 根据主键查询，找不到时返回 null。
-    const product = await this.productRepository.findOneBy({ id });
-    if (!product) {
-      throw new NotFoundException(`商品不存在，id: ${id}`);
-    }
-    // step2: 合并修改：`merge(product, dto)` 把传入字段合并到已查询的实体中，这一步只修改内存对象。
-    this.productRepository.merge(product, dto);
-    // step3: 保存修改：`save(product)` 把内存对象保存到数据库中，执行 SQL。
-    return this.productRepository.save(product);
+    return this.productRepository.manager.transaction(
+      'READ COMMITTED',
+      async (manager) => {
+        const product = await manager.findOne(Product, {
+          where: { id },
+          lock: { mode: 'pessimistic_write' },
+        });
+
+        if (!product) {
+          throw new NotFoundException(`商品不存在，id: ${id}`);
+        }
+
+        manager.merge(Product, product, dto);
+
+        return manager.save(Product, product);
+      },
+    );
   }
 }
